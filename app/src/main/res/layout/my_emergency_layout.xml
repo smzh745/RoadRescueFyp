@@ -13,65 +13,61 @@
     app:cardCornerRadius="@dimen/_10sdp"
     app:cardElevation="@dimen/_5sdp">
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_5sdp">
+        <LinearLayout
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
 
-        <RelativeLayout
-            android:id="@+id/layout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_marginEnd="5dip"
+            android:padding="3dip">
+
+            <ImageView
+                android:id="@+id/list_image"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_contacts_black_24dp" />
+
+        </LinearLayout>
 
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/complaintType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true"
+                android:layout_width="318dp"
+                android:layout_height="40dp"
+                android:layout_toEndOf="@+id/thumbnail"
+
+                android:layout_alignParentTop="true"
                 android:layout_marginStart="@dimen/_2sdp"
-                android:layout_toEndOf="@id/title"
                 android:text="@string/name1"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/_12ssp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/layout1"
-            android:layout_marginTop="@dimen/_2sdp">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/selectCity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_alignParentStart="true"
-                android:text="@string/number"
                 android:textColor="@color/colorText"
-                android:textSize="@dimen/_14ssp" />
+                android:textSize="@dimen/_12ssp" />
+
+
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/city"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_alignBottom="@+id/complaintType"
+                android:layout_marginTop="@dimen/_2sdp"
                 android:layout_margin="@dimen/_2sdp"
-                android:layout_toEndOf="@id/selectCity"
+                android:layout_toEndOf="@+id/thumbnail"
                 android:text="@string/complaint_type"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/_12ssp" />
-        </RelativeLayout>
+                android:textColor="@color/colorText"
+                android:textSize="@dimen/_12ssp"
+                tools:ignore="RelativeOverlap" />
 
         <ImageView
             android:id="@+id/call"
             android:layout_width="30dp"
             android:layout_height="40dp"
-            android:layout_below="@+id/layout"
             android:layout_alignParentEnd="true"
             android:layout_margin="@dimen/_5sdp"
             android:clickable="true"
@@ -81,5 +77,5 @@
             android:src="@drawable/ic_call_black_24dp"
             tools:ignore="UnusedAttribute"
             tools:targetApi="m" />
-    </LinearLayout>
+    </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>
