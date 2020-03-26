@@ -4,9 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +17,23 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.road.rescue.app.R;
+import com.road.rescue.app.utils.Constants;
+import com.road.rescue.app.utils.InternetConnection;
+import com.road.rescue.app.utils.RequestHandler;
 import com.road.rescue.app.utils.SharedPrefUtils;
 import com.road.rescue.app.utils.VolleyMultipartRequest;
 
@@ -39,7 +47,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
+import static com.road.rescue.app.utils.Constants.TAGI;
 import static com.road.rescue.app.utils.Constants.USER_COMPLAINT;
+import static com.road.rescue.app.utils.Constants.USER_MY_COMPLAINTS;
 
 
 public class ComplaintSystemFragment extends Basefragment {
@@ -75,7 +85,7 @@ public class ComplaintSystemFragment extends Basefragment {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadComplaintDetails();
+              uploadComplaintDetails();
             }
         });
         return view;
@@ -167,67 +177,147 @@ public class ComplaintSystemFragment extends Basefragment {
                 || complaintT.equalsIgnoreCase("Complaint Type") || TextUtils.isEmpty(details) || thumbnail == null) {
             baseActivity.showToast("Please choose all options");
         } else {
-            baseActivity.setProgressDialog("Sending your complaint..");
-            //our custom volley request
-            VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, USER_COMPLAINT,
-                    new Response.Listener<NetworkResponse>() {
-                        @Override
-                        public void onResponse(NetworkResponse response) {
+            if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
+
+                baseActivity.setProgressDialog("Sending your complaint..");
+                //our custom volley request
+                VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, USER_COMPLAINT,
+                        new Response.Listener<NetworkResponse>() {
+                            @Override
+                            public void onResponse(NetworkResponse response) {
+                                try {
+                                    JSONObject obj = new JSONObject(new String(response.data));
+
+                                    fetchAllComplaint(obj.getString("message"));
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                complaintDetails.getText().clear();
+                                Glide.with(Objects.requireNonNull(getActivity())).load(R.drawable.addimage).into(imagePick);
+                                setSpinner(R.array.complaint_array, complaintType);
+                                setSpinner(R.array.city_array, selectCity);
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                baseActivity.showToast(error.getMessage());
+                                baseActivity.cancelProgressDialog();
+
+                            }
+                        }) {
+
+                    /*
+                     * If you want to add more parameters with the image
+                     * you can do it here
+                     * here we have only one parameter with the image
+                     * which is tags
+                     * */
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("uid", SharedPrefUtils.getStringData(Objects.requireNonNull(getActivity()), "uid"));
+                        params.put("complaintdetails", details);
+                        params.put("complainttype", complaintT);
+                        params.put("city", city);
+                        params.put("cdate", baseActivity.getCurrentDate());
+                        params.put("ctime", baseActivity.getCurrentTime());
+                        return params;
+                    }
+
+                    /*
+                     * Here we are passing image by renaming it with a unique name
+                     * */
+                    @Override
+                    protected Map<String, DataPart> getByteData() {
+                        Map<String, DataPart> params = new HashMap<>();
+                        long imagename = System.currentTimeMillis();
+                        params.put("pic", new DataPart(imagename + ".png", getFileDataFromDrawable(thumbnail)));
+                        return params;
+                    }
+                };
+                volleyMultipartRequest.setRetryPolicy(new RetryPolicy() {
+                    @Override
+                    public int getCurrentTimeout() {
+                        return 50000;
+                    }
+
+                    @Override
+                    public int getCurrentRetryCount() {
+                        return 50000;
+                    }
+
+                    @Override
+                    public void retry(VolleyError error) {
+                        Log.d(TAGI, "retry: " + error.getMessage());
+                    }
+                });
+                //adding the request to volley
+                Volley.newRequestQueue(Objects.requireNonNull(getActivity())).add(volleyMultipartRequest);
+            } else {
+                baseActivity.showToast("No Internet Connection!");
+
+            }
+
+        }
+    }
+
+    private void fetchAllComplaint(final String message) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                Constants.ROOT_URL + USER_MY_COMPLAINTS,
+                new Response.Listener<String>() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onResponse(String response) {
+                        try {
                             try {
-                                JSONObject obj = new JSONObject(new String(response.data));
-                                baseActivity.showToast(obj.getString("message"));
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
+
+                                    Log.d(TAGI, "e1: " + obj.getString("message"));
+                                    baseActivity.showToast(message);
+                                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "myComplaints", obj.getString("message"));
+                                } else {
+                                    baseActivity.showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1: " + obj.getString("message"));
+
+
+                                }
+                                baseActivity.cancelProgressDialog();
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                baseActivity.cancelProgressDialog();
                             }
-                            baseActivity.cancelProgressDialog();
-                            complaintDetails.getText().clear();
-                            Glide.with(Objects.requireNonNull(getActivity())).load(R.drawable.addimage).into(imagePick);
-                            setSpinner(R.array.complaint_array, complaintType);
-                            setSpinner(R.array.city_array, selectCity);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try {
+                            baseActivity.cancelProgressDialog();
                             baseActivity.showToast(error.getMessage());
-                            baseActivity.cancelProgressDialog();
-
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    }) {
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
 
-                /*
-                 * If you want to add more parameters with the image
-                 * you can do it here
-                 * here we have only one parameter with the image
-                 * which is tags
-                 * */
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("uid", SharedPrefUtils.getStringData(Objects.requireNonNull(getActivity()), "uid"));
-                    params.put("complaintdetails", details);
-                    params.put("complainttype", complaintT);
-                    params.put("city", city);
-                    params.put("cdate", baseActivity.getCurrentDate());
-                    params.put("ctime", baseActivity.getCurrentTime());
-                    return params;
-                }
+                Map<String, String> params = new HashMap<>();
+                params.put("uid", SharedPrefUtils.getStringData(Objects.requireNonNull(getActivity()), "uid"));
 
-                /*
-                 * Here we are passing image by renaming it with a unique name
-                 * */
-                @Override
-                protected Map<String, DataPart> getByteData() {
-                    Map<String, DataPart> params = new HashMap<>();
-                    long imagename = System.currentTimeMillis();
-                    params.put("pic", new DataPart(imagename + ".png", getFileDataFromDrawable(thumbnail)));
-                    return params;
-                }
-            };
 
-            //adding the request to volley
-            Volley.newRequestQueue(Objects.requireNonNull(getActivity())).add(volleyMultipartRequest);
-        }
+                return params;
+            }
+        };
+
+
+        RequestHandler.getInstance(getActivity()).addToRequestQueue(stringRequest);
     }
 
     /*
