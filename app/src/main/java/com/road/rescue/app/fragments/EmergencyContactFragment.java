@@ -1,8 +1,11 @@
 package com.road.rescue.app.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +27,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.road.rescue.app.R;
+import com.road.rescue.app.activities.ShowAllContactsActivity;
 import com.road.rescue.app.adapter.EmergencyContactAdapter;
 import com.road.rescue.app.model.EmergencyContact;
 import com.road.rescue.app.utils.Constants;
@@ -63,7 +67,7 @@ public class EmergencyContactFragment extends Basefragment {
         addEmergencyContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addEmergencyContactDialog();
+                showDialog();
             }
         });
     /*    if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
@@ -72,7 +76,7 @@ public class EmergencyContactFragment extends Basefragment {
             baseActivity.showToast("No Internet Connection!");
             init();
         }*/
-        init();
+
         return view;
     }
 
@@ -283,5 +287,40 @@ public class EmergencyContactFragment extends Basefragment {
         RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(reLayoutManager);
         recyclerView.setAdapter(myComplaintAdapter);
+    }
+
+    //choose dialog
+    private void showDialog() {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        pictureDialog.setTitle("Select Action");
+
+        String[] pictureDialogItems = {
+                "Add Contact from Phone",
+                "Add Contact Manually"};
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                Intent intent = new Intent(getActivity(), ShowAllContactsActivity.class);
+                                intent.putExtra("isFromContact", true);
+                                startActivity(intent);
+                                dialog.dismiss();
+                                break;
+                            case 1:
+                                addEmergencyContactDialog();
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                });
+        pictureDialog.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        init();
     }
 }

@@ -43,12 +43,14 @@ import static com.road.rescue.app.utils.Constants.TAGI;
 public class ShowAllContactsActivity extends BaseActivity {
     private RecyclerView recyclerView;
     private List<EmergencyContact> myComplaintList;
+    private boolean isFromContact = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_all_contacts);
         recyclerView = findViewById(R.id.recycler_home);
+        isFromContact = getIntent().getBooleanExtra("isFromContact", false);
         myComplaintList = new ArrayList<>();
         getAllContacts(getContentResolver());
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new ClickListener() {
@@ -112,9 +114,13 @@ public class ShowAllContactsActivity extends BaseActivity {
                                         Log.d(TAGI, "e" + obj.getString("message"));
                                         showToast(obj.getString("message"));
                                         SharedPrefUtils.saveData(ShowAllContactsActivity.this, "eData", obj.getString("data"));
-                                        SharedPrefUtils.saveData(ShowAllContactsActivity.this, "isContact", true);
-                                        startNewActivity(new MainActivity());
-                                        finish();
+                                        if (isFromContact) {
+                                            finish();
+                                        } else {
+                                            SharedPrefUtils.saveData(ShowAllContactsActivity.this, "isContact", true);
+                                            startNewActivity(new MainActivity());
+                                            finish();
+                                        }
                                     } else {
                                         showToast(obj.getString("message"));
                                         Log.d(TAGI, "e1" + obj.getString("message"));
@@ -185,7 +191,11 @@ public class ShowAllContactsActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        finishAffinity();
+        if (isFromContact) {
+            finish();
+        } else {
+            finishAffinity();
+        }
     }
 
     private void setDataOnRecycler() {
