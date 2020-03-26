@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/_10sdp"
+    android:orientation="vertical"
+    tools:context=".fragments.ComplaintSystemFragment">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="@dimen/_10sdp"
+        android:text="@string/write_your_complaint_here"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_14ssp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Spinner
+                android:id="@+id/complaintType"
+                android:layout_width="@dimen/_240sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_5sdp"
+                android:background="@drawable/gradient_spinner"
+                android:elevation="@dimen/_5sdp"
+                android:gravity="center"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
+
+            <Spinner
+                android:id="@+id/selectCity"
+                android:layout_width="@dimen/_240sdp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/_5sdp"
+                android:background="@drawable/gradient_spinner"
+                android:elevation="@dimen/_5sdp"
+                android:gravity="center"
+                android:overScrollMode="never"
+                android:scrollbars="none" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/complaintDetailsInput"
+                android:layout_width="@dimen/_240sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:textColorHint="@color/colorText"
+                app:boxBackgroundColor="@android:color/white"
+                app:boxStrokeColor="@color/colorText">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/complaintDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="@string/write_complaint_detail"
+                    android:hint="@string/write_complaint_detail"
+                    android:inputType="textMultiLine"
+                    android:lines="6"
+                    android:maxLines="6"
+                    android:minLines="3"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/colorText"
+                    android:textSize="@dimen/_12ssp"
+                    tools:targetApi="o" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <include layout="@layout/add_image_layout" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/send"
+                android:layout_width="@dimen/_120sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:backgroundTint="@color/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/send" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

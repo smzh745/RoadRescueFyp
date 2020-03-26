@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomMainButtons">
+        <attr name="maintext" format="string" />
+        <attr name="mainimage" format="reference" />
+    </declare-styleable>
+</resources>

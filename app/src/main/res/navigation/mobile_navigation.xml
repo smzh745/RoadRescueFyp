@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home"
+    tools:ignore="UnusedNavigation">
+
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.road.rescue.app.fragments.HomeFragment"
+        android:label="@string/home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_complaintSystemFragment"
+            app:destination="@id/complaintSystemFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_emergencyContactFragment"
+            app:destination="@id/emergencyContactFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_complaint"
+        android:name="com.road.rescue.app.fragments.MyComplaintsFragment"
+        android:label="@string/my_complaints"
+        tools:layout="@layout/fragment_my_complaints" />
+    <fragment
+        android:id="@+id/nav_pass"
+        android:name="com.road.rescue.app.fragments.ChangePasswordFragment"
+        android:label="@string/change_password"
+        tools:layout="@layout/fragment_change_password" />
+    <fragment
+        android:id="@+id/complaintSystemFragment"
+        android:name="com.road.rescue.app.fragments.ComplaintSystemFragment"
+        android:label="@string/complaint_system"
+        tools:layout="@layout/fragment_complaint_system" />
+    <fragment
+        android:id="@+id/emergencyContactFragment"
+        android:name="com.road.rescue.app.fragments.EmergencyContactFragment"
+        android:label="@string/add_emergency_contact"
+        tools:layout="@layout/fragment_emergency_contact" />
+</navigation>
