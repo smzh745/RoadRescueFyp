@@ -13,7 +13,8 @@
     app:cardCornerRadius="@dimen/_10sdp"
     app:cardElevation="@dimen/_5sdp">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_5sdp">
@@ -23,14 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:text="@string/name1"
-                android:textColor="@color/colorText"
-                android:textSize="@dimen/_14ssp" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/complaintType"
@@ -88,5 +81,5 @@
             android:src="@drawable/ic_call_black_24dp"
             tools:ignore="UnusedAttribute"
             tools:targetApi="m" />
-    </RelativeLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
