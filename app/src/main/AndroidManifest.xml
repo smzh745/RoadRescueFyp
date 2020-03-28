@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.SEND_SMS"/>
 
     <application
         android:allowBackup="true"
@@ -23,8 +25,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="LockedOrientationActivity"
         tools:targetApi="q">
-        <activity android:name=".activities.ShowAllContactsActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.ShowAllContactsActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.ForgetPasswordActivity"
             android:screenOrientation="portrait" />
@@ -50,6 +53,7 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+        <service android:name=".services.ShakeService" />
     </application>
 
 </manifest>

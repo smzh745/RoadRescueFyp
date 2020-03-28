@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -37,7 +36,7 @@ public class PermissionsUtils {
     public static final String PERMISSION_READ_SMS = Manifest.permission.READ_SMS;
     public static final String PERMISSION_RECEIVE_WAP_PUSH = Manifest.permission.RECEIVE_WAP_PUSH;
     public static final String PERMISSION_RECEIVE_MMS = Manifest.permission.RECEIVE_MMS;
-    public static final String PERMISSION_READ_EXTERNAL_STORAGE = READ_EXTERNAL_STORAGE;
+    private static final String PERMISSION_READ_EXTERNAL_STORAGE = READ_EXTERNAL_STORAGE;
     public static final String PERMISSION_WRITE_EXTERNAL_STORAGE = WRITE_EXTERNAL_STORAGE;
     public static final String PERMISSION_GET_ACCOUNTS = Manifest.permission.GET_ACCOUNTS;
     public static final String PERMISSION_ACCESS_INTERNET = Manifest.permission.INTERNET;
@@ -77,7 +76,8 @@ public class PermissionsUtils {
         requiredPermissions = new ArrayList<>();
         requiredPermissions.add(PERMISSION_READ_EXTERNAL_STORAGE);
         requiredPermissions.add(PERMISSION_CALL_PHONE);
-        requiredPermissions.add(READ_CONTACTS);
+        requiredPermissions.add(PERMISSION_READ_CONTACTS);
+        requiredPermissions.add(PERMISSION_SEND_SMS);
 
         //Add all the required permission in the list
     }
