@@ -11,13 +11,16 @@
         android:id="@+id/nav_home"
         android:name="com.road.rescue.app.fragments.HomeFragment"
         android:label="@string/home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_nav_home_to_complaintSystemFragment"
             app:destination="@id/complaintSystemFragment" />
         <action
             android:id="@+id/action_nav_home_to_emergencyContactFragment"
             app:destination="@id/emergencyContactFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_nationalEmergencyFragment"
+            app:destination="@id/nationalEmergencyFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_complaint"
@@ -39,4 +42,8 @@
         android:name="com.road.rescue.app.fragments.EmergencyContactFragment"
         android:label="@string/add_emergency_contact"
         tools:layout="@layout/fragment_emergency_contact" />
+    <fragment
+        android:id="@+id/nationalEmergencyFragment"
+        android:name="com.road.rescue.app.fragments.NationalEmergencyFragment"
+        android:label="@string/national_emergency" />
 </navigation>
