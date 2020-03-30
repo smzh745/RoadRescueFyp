@@ -53,6 +53,8 @@
     <string name="enable_perm">You need to enable these permissions.</string>
     <string name="choose_one_of_the_following_contacts_as_your_emergency_contact">Choose one of the following contacts as your emergency contact</string>
     <string name="done">Done</string>
+    <string name="keyword">Search by Name</string>
+    <string name="no_contact_found">No Contact found</string>
     <string-array name="complaint_array">
         <item>Complaint Type</item>
         <item>Traffic Jam</item>
