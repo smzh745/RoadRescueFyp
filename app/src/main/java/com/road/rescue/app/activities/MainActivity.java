@@ -1,6 +1,7 @@
 package com.road.rescue.app.activities;
 
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,7 +88,8 @@ public class MainActivity extends BaseActivity {
                     Log.d(TAGI, "sendSmsToContacts: " + jsonObject.getString("econtact"));
                     Log.d(TAGI, "sendSmsToContacts: long: " + longi);
                     Log.d(TAGI, "sendSmsToContacts: lat: " + lat);
-
+                    sendSMS(jsonObject.getString("econtact"), "Please help me its an emergency. I am in trouble and in lots of pain. This is my location:\n\n" + "https://www.google.com/maps/@" + lat + "," + longi + "\n\n" +
+                            "Come hurry up!");
 
                 }
             }
@@ -103,5 +105,12 @@ public class MainActivity extends BaseActivity {
                 || super.onSupportNavigateUp();
     }
 
-
+    private void sendSMS(String phoneNo, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

@@ -32,6 +32,7 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     }
 
     private ShakeDetector sd;
+    
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -51,6 +52,7 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
             if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
                 if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("isHelpActive", true);
                     startActivity(intent);
                 }
