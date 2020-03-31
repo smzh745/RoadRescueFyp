@@ -1,6 +1,4 @@
-package com.road.rescue.app.services; /**
- * Created by HP# on 06/07/2018.
- */
+package com.road.rescue.app.services;
 
 import android.app.AlertDialog;
 import android.app.Service;
