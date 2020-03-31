@@ -5,5 +5,5 @@
     <color name="colorAccent">#999999</color>
     <color name="colorText">#000</color>
     <color name="colorGrey">#EFEEF0</color>
-
+    <color name="colorGainsboro">#DCDCDC</color>
 </resources>

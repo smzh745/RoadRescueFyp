@@ -1,6 +1,7 @@
 package com.road.rescue.app.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -14,10 +15,18 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 import com.road.rescue.app.R;
+import com.road.rescue.app.services.GPSTracker;
 import com.road.rescue.app.utils.SharedPrefUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import static com.road.rescue.app.utils.Constants.TAGI;
 
 public class MainActivity extends BaseActivity {
     private AppBarConfiguration mAppBarConfiguration;
+    private GPSTracker gpsTracker;
+    private String lat, longi = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +37,8 @@ public class MainActivity extends BaseActivity {
         } else if (!SharedPrefUtils.getBooleanData(this, "isContact")) {
             startNewActivity(new ShowAllContactsActivity());
         } else {
+            gpsTracker = new GPSTracker(this);
+            sendSmsToContacts();
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
             DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -59,6 +70,29 @@ public class MainActivity extends BaseActivity {
             });
 
 
+        }
+    }
+
+    private void sendSmsToContacts() {
+        try {
+
+            if (getIntent().getBooleanExtra("isHelpActive", false)) {
+                if (gpsTracker.canGetLocation()) {
+                    lat = String.valueOf(gpsTracker.getLatitude());
+                    longi = String.valueOf(gpsTracker.getLongitude());
+                }
+                JSONArray jsonArray = new JSONArray(SharedPrefUtils.getStringData(getApplicationContext(), "eData"));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Log.d(TAGI, "sendSmsToContacts: " + jsonObject.getString("econtact"));
+                    Log.d(TAGI, "sendSmsToContacts: long: " + longi);
+                    Log.d(TAGI, "sendSmsToContacts: lat: " + lat);
+
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -10,12 +10,13 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.road.rescue.app.R;
+import com.road.rescue.app.activities.MainActivity;
+import com.road.rescue.app.utils.SharedPrefUtils;
 import com.squareup.seismic.ShakeDetector;
 
 import java.util.Objects;
@@ -46,8 +47,15 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     @Override
     public void hearShake() {
         Log.d(TAGI, "hearShake: ");
-        Toast.makeText(this, "Don't shake me, bro!", Toast.LENGTH_SHORT).show();
-
+        if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isLogin")) {
+            if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
+                if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.putExtra("isHelpActive", true);
+                    startActivity(intent);
+                }
+            }
+        }
     }
 
     private void startServiceOreoCondition() {
@@ -56,7 +64,7 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
 
 
                 String CHANNEL_ID = "ch_745";
-                String CHANNEL_NAME = "Road Rescue Shake Servcice";
+                String CHANNEL_NAME = "Road Rescue Shake Service";
 
                 NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
                         CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
