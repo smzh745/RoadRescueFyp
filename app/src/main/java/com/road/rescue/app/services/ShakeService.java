@@ -32,7 +32,7 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     }
 
     private ShakeDetector sd;
-    
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

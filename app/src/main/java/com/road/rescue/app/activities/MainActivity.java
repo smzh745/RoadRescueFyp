@@ -88,7 +88,7 @@ public class MainActivity extends BaseActivity {
                     Log.d(TAGI, "sendSmsToContacts: " + jsonObject.getString("econtact"));
                     Log.d(TAGI, "sendSmsToContacts: long: " + longi);
                     Log.d(TAGI, "sendSmsToContacts: lat: " + lat);
-                    sendSMS(jsonObject.getString("econtact"), "Please help me its an emergency. I am in trouble and in lots of pain. This is my location:\n\n" + "https://www.google.com/maps/@" + lat + "," + longi + "\n\n" +
+                    sendSMS(jsonObject.getString("econtact"), "Please help me its an emergency. I am in trouble and in lots of pain. This is my location:\n\n" + "http://maps.google.com/?q=" + lat + "," + longi + "\n\n" +
                             "Come hurry up!");
 
                 }
