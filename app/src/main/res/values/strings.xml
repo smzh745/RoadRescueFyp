@@ -55,6 +55,11 @@
     <string name="done">Done</string>
     <string name="keyword">Search by Name</string>
     <string name="no_contact_found">No Contact found</string>
+    <string name="enable_shake">Enable Shake</string>
+    <string name="help_me">Help Me!</string>
+    <string name="enable_national_emergency_call">Enable national emergency call</string>
+    <string name="call">Call</string>
+    <string name="enable_help_me_to_send_sms_to_all_emergency_contacts">Enable help me to send SMS to all emergency contacts</string>
     <string-array name="complaint_array">
         <item>Complaint Type</item>
         <item>Traffic Jam</item>

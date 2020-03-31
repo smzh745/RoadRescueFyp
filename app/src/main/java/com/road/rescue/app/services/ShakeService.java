@@ -1,14 +1,27 @@
 package com.road.rescue.app.services;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
+import com.road.rescue.app.R;
 import com.squareup.seismic.ShakeDetector;
+
+import java.util.Objects;
+
+import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
+import static com.road.rescue.app.utils.Constants.TAGI;
 
 public class ShakeService extends Service implements ShakeDetector.Listener {
     @Nullable
@@ -17,18 +30,54 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
         return null;
     }
 
+    private ShakeDetector sd;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        startServiceOreoCondition();
+        Log.d(TAGI, "onStartCommand: ");
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        ShakeDetector sd = new ShakeDetector(this);
+        sd = new ShakeDetector(this);
         sd.start(sensorManager);
+
         return START_STICKY;
     }
 
     @Override
     public void hearShake() {
+        Log.d(TAGI, "hearShake: ");
         Toast.makeText(this, "Don't shake me, bro!", Toast.LENGTH_SHORT).show();
 
+    }
+
+    private void startServiceOreoCondition() {
+        try {
+            if (Build.VERSION.SDK_INT >= 26) {
+
+
+                String CHANNEL_ID = "ch_745";
+                String CHANNEL_NAME = "Road Rescue Shake Servcice";
+
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                        CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
+                ((NotificationManager) Objects.requireNonNull(getSystemService(Context.NOTIFICATION_SERVICE))).createNotificationChannel(channel);
+
+                Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setSubText(getString(R.string.app_name))
+                        .setContentText("This service use shake process in background and will help you when you shake your phone in emergency.")
+                        .setCategory(Notification.CATEGORY_SERVICE).setSmallIcon(R.mipmap.ic_launcher).setPriority(PRIORITY_MIN).build();
+
+
+                startForeground(745, notification);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        sd.stop();
+        super.onDestroy();
     }
 }

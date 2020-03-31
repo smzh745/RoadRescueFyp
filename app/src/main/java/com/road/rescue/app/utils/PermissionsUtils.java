@@ -78,6 +78,8 @@ public class PermissionsUtils {
         requiredPermissions.add(PERMISSION_CALL_PHONE);
         requiredPermissions.add(PERMISSION_READ_CONTACTS);
         requiredPermissions.add(PERMISSION_SEND_SMS);
+        requiredPermissions.add(PERMISSION_ACCESS_FINE_LOCATION);
+        requiredPermissions.add(PERMISSION_ACCESS_COARSE_LOCATION);
 
         //Add all the required permission in the list
     }

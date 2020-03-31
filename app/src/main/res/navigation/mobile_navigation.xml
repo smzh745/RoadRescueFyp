@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_nav_home_to_nationalEmergencyFragment"
             app:destination="@id/nationalEmergencyFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/nav_complaint"
@@ -46,4 +49,9 @@
         android:id="@+id/nationalEmergencyFragment"
         android:name="com.road.rescue.app.fragments.NationalEmergencyFragment"
         android:label="@string/national_emergency" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.road.rescue.app.fragments.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

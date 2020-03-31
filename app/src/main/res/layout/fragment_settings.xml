@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+    tools:context=".fragments.SettingsFragment">
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/enableShake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:padding="@dimen/_5sdp"
+        android:text="@string/enable_shake"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_14ssp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_2sdp"
+        android:background="@color/colorGrey" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:padding="@dimen/_5sdp"
+        android:text="@string/enable_help_me_to_send_sms_to_all_emergency_contacts"
+        android:textSize="@dimen/_14ssp" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/enableHelp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:padding="@dimen/_5sdp"
+        android:text="@string/help_me"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_14ssp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_2sdp"
+        android:background="@color/colorGrey" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:padding="@dimen/_5sdp"
+        android:text="@string/enable_national_emergency_call"
+        android:textSize="@dimen/_14ssp" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/enableCall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:padding="@dimen/_5sdp"
+        android:text="@string/call"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/_12ssp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_2sdp"
+        android:background="@color/colorGrey" />
+</LinearLayout>

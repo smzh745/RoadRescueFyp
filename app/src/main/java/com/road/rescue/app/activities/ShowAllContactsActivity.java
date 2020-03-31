@@ -25,7 +25,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.textview.MaterialTextView;
 import com.road.rescue.app.R;
 import com.road.rescue.app.adapter.ContactAdapter;
-import com.road.rescue.app.adapter.EmergencyContactAdapter;
 import com.road.rescue.app.model.EmergencyContact;
 import com.road.rescue.app.utils.ClickListener;
 import com.road.rescue.app.utils.Constants;
@@ -101,7 +100,7 @@ public class ShowAllContactsActivity extends BaseActivity {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(ShowAllContactsActivity.this);
-        builder.setMessage("Are you sure you want to add this number as emergncy contact?").setPositiveButton("Yes", dialogClickListener)
+        builder.setMessage("Are you sure you want to add this number as emergency contact?").setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
 

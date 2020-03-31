@@ -1,6 +1,5 @@
 package com.road.rescue.app.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +14,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
 import com.road.rescue.app.R;
-import com.road.rescue.app.services.ShakeService;
 import com.road.rescue.app.utils.SharedPrefUtils;
 
 public class MainActivity extends BaseActivity {

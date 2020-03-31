@@ -11,18 +11,16 @@ import com.road.rescue.app.utils.CustomMainButtons;
 
 public class HomeFragment extends Basefragment implements View.OnClickListener {
 
-    private CustomMainButtons settings, nationalEmergencyService, addEmergencyContact, complaintSystem;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        settings = view.findViewById(R.id.settings);
-        nationalEmergencyService = view.findViewById(R.id.nationalEmergencyService);
-        addEmergencyContact = view.findViewById(R.id.addEmergencyContact);
-        complaintSystem = view.findViewById(R.id.complaintSystem);
+        CustomMainButtons settings = view.findViewById(R.id.settings);
+        CustomMainButtons nationalEmergencyService = view.findViewById(R.id.nationalEmergencyService);
+        CustomMainButtons addEmergencyContact = view.findViewById(R.id.addEmergencyContact);
+        CustomMainButtons complaintSystem = view.findViewById(R.id.complaintSystem);
 
         settings.setOnClickListener(this);
         nationalEmergencyService.setOnClickListener(this);
@@ -38,6 +36,7 @@ public class HomeFragment extends Basefragment implements View.OnClickListener {
                 navigateFragment(R.id.complaintSystemFragment);
                 break;
             case R.id.settings:
+                navigateFragment(R.id.settingsFragment);
                 break;
             case R.id.addEmergencyContact:
                 navigateFragment(R.id.emergencyContactFragment);
