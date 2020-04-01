@@ -15,7 +15,7 @@
         android:padding="@dimen/_5sdp"
         android:text="@string/enable_shake"
         android:textColor="@color/colorText"
-        android:textSize="@dimen/_14ssp" />
+        android:textSize="@dimen/_12ssp" />
 
     <View
         android:layout_width="match_parent"
@@ -39,7 +39,7 @@
         android:padding="@dimen/_5sdp"
         android:text="@string/help_me"
         android:textColor="@color/colorText"
-        android:textSize="@dimen/_14ssp" />
+        android:textSize="@dimen/_12ssp" />
 
     <View
         android:layout_width="match_parent"

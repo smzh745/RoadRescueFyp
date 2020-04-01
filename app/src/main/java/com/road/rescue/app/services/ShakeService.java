@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.telephony.SmsManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -18,6 +19,9 @@ import com.road.rescue.app.R;
 import com.road.rescue.app.activities.MainActivity;
 import com.road.rescue.app.utils.SharedPrefUtils;
 import com.squareup.seismic.ShakeDetector;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -32,7 +36,15 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     }
 
     private ShakeDetector sd;
+    private GPSTracker gpsTracker;
+    private String lat, longi = null;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        gpsTracker = new GPSTracker(this);
+
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -51,13 +63,28 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
         if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isLogin")) {
             if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
                 if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("isHelpActive", true);
-                    startActivity(intent);
+                    if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isCall")) {
+                        sendSmsToContacts();
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("isHelpActive", true);
+                        startActivity(intent);
+                    }
                 }
+                if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isCall")) {
+                    Intent intent = new Intent(getApplicationContext(), OverlayService.class);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(intent);
+                    } else {
+                        startService(intent);
+                    }
+                }
+
             }
         }
+
     }
 
     private void startServiceOreoCondition() {
@@ -89,5 +116,37 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     public void onDestroy() {
         sd.stop();
         super.onDestroy();
+    }
+
+    private void sendSmsToContacts() {
+        try {
+
+            if (gpsTracker.canGetLocation()) {
+                lat = String.valueOf(gpsTracker.getLatitude());
+                longi = String.valueOf(gpsTracker.getLongitude());
+            }
+            JSONArray jsonArray = new JSONArray(SharedPrefUtils.getStringData(getApplicationContext(), "eData"));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Log.d(TAGI, "sendSmsToContacts: " + jsonObject.getString("econtact"));
+                Log.d(TAGI, "sendSmsToContacts: long: " + longi);
+                Log.d(TAGI, "sendSmsToContacts: lat: " + lat);
+                sendSMS(jsonObject.getString("econtact"), "Please help me its an emergency. I am in trouble and in lots of pain. This is my location:\n\n" + "http://maps.google.com/?q=" + lat + "," + longi + "\n\n" +
+                        "Come hurry up!");
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendSMS(String phoneNo, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

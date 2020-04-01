@@ -32,6 +32,7 @@ public class SettingsFragment extends Basefragment {
         checkShakeEnabled();
         enableShake.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isShake"));
         enableHelp.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isHelp"));
+        enableCall.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isCall"));
 
         enableShake.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -54,6 +55,17 @@ public class SettingsFragment extends Basefragment {
                     SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", true);
                 } else {
                     SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", false);
+
+                }
+            }
+        });
+        enableCall.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isCall", true);
+                } else {
+                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isCall", false);
 
                 }
             }

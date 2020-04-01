@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -55,7 +57,18 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+
         <service android:name=".services.ShakeService" />
+        <service android:name=".services.OverlayService" />
+
+        <activity
+            android:name=".activities.HaltScreenActivity"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoTitle"
+            android:turnScreenOn="true"
+            tools:targetApi="o_mr1" />
+
     </application>
 
 </manifest>
