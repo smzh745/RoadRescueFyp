@@ -63,7 +63,7 @@ class Basefragment extends Fragment {
     }
 
     //TODO: navigate to fragment
-    public void navigateFragment(int id){
-        Navigation.findNavController(getActivity(),R.id.nav_host_fragment).navigate(id);
+    void navigateFragment(int id){
+        Navigation.findNavController(Objects.requireNonNull(getActivity()),R.id.nav_host_fragment).navigate(id);
     }
 }
