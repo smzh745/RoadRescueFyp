@@ -1,7 +1,6 @@
 package com.road.rescue.app.activities;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -11,11 +10,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 
-import androidx.annotation.RequiresApi;
-
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.textview.MaterialTextView;
 import com.road.rescue.app.R;
@@ -67,12 +62,9 @@ public class SignUpActivity extends BaseActivity {
             }
         });
         //checking password input
-        passwordinput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    validatePasswordField(((EditText) v).getText());
-                }
+        passwordinput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                validatePasswordField(((EditText) v).getText());
             }
         });
         /*
@@ -93,12 +85,9 @@ public class SignUpActivity extends BaseActivity {
             }
         });
         //checking email input
-        email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    validateEmailfield(((EditText) v).getText());
-                }
+        email.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                validateEmailfield(((EditText) v).getText());
             }
         });
     }
@@ -142,42 +131,35 @@ public class SignUpActivity extends BaseActivity {
             setProgressDialog("Registering user...");
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     Constants.ROOT_URL + USER_REG,
-                    new Response.Listener<String>() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void onResponse(String response) {
+                    response -> {
+                        try {
                             try {
-                                try {
-                                    JSONObject obj = new JSONObject(response);
-                                    if (!obj.getBoolean("error")) {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
 
-                                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                                        finishAffinity();
-                                        Log.d(TAGI, "e" + obj.getString("message"));
-                                        showToast(obj.getString("message"));
-                                    } else {
-                                        showToast(obj.getString("message"));
-                                        Log.d(TAGI, "e1" + obj.getString("message"));
-                                    }
-                                    cancelProgressDialog();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    cancelProgressDialog();
+                                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                    finishAffinity();
+                                    Log.d(TAGI, "e" + obj.getString("message"));
+                                    showToast(obj.getString("message"));
+                                } else {
+                                    showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1" + obj.getString("message"));
                                 }
-                            } catch (Exception e) {
+                                cancelProgressDialog();
+                            } catch (JSONException e) {
                                 e.printStackTrace();
+                                cancelProgressDialog();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            try {
-                                cancelProgressDialog();
-                                showToast(error.getMessage());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    error -> {
+                        try {
+                            cancelProgressDialog();
+                            showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }) {
                 @Override

@@ -47,24 +47,21 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
         final EmergencyContact myComplaint = myComplaintList.get(position);
         holder.city.setText(myComplaint.geteContact());
         holder.complaintType.setText(myComplaint.geteName());
-        holder.call.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_CALL);
+        holder.call.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_CALL);
 
-                intent.setData(Uri.parse("tel:" + myComplaint.geteContact()));
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                context.startActivity(intent);
+            intent.setData(Uri.parse("tel:" + myComplaint.geteContact()));
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
             }
+            context.startActivity(intent);
         });
     }
 
@@ -73,11 +70,12 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
         return myComplaintList.size();
     }
 
-   public static class MyHolder extends RecyclerView.ViewHolder {
+    public static class MyHolder extends RecyclerView.ViewHolder {
         MaterialTextView complaintType, city;
         MaterialCardView clickBtn;
         ImageView call;
-       public RelativeLayout viewBackground, viewForeground;
+        RelativeLayout viewBackground, viewForeground;
+
         MyHolder(@NonNull View itemView) {
             super(itemView);
             call = itemView.findViewById(R.id.call);
@@ -88,6 +86,7 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
             viewForeground = itemView.findViewById(R.id.view_foreground);
         }
     }
+
     public void removeItem(int position) {
         myComplaintList.remove(position);
         // notify the item removed by position

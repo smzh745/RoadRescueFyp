@@ -11,11 +11,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 
-import androidx.annotation.RequiresApi;
-
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.textview.MaterialTextView;
 import com.road.rescue.app.R;
@@ -70,12 +66,9 @@ public class LoginActivity extends BaseActivity {
                 }
             });
             //checking password input
-            passwordinput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (!hasFocus) {
-                        validatePasswordField(((EditText) v).getText());
-                    }
+            passwordinput.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    validatePasswordField(((EditText) v).getText());
                 }
             });
             /*
@@ -96,12 +89,9 @@ public class LoginActivity extends BaseActivity {
                 }
             });
             //checking email input
-            email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (!hasFocus) {
-                        validateEmailfield(((EditText) v).getText());
-                    }
+            email.setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    validateEmailfield(((EditText) v).getText());
                 }
             });
             if (Build.VERSION.SDK_INT >= 23) {
@@ -157,44 +147,37 @@ public class LoginActivity extends BaseActivity {
             setProgressDialog("Authenticating user...");
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     Constants.ROOT_URL + USER_LOGIN,
-                    new Response.Listener<String>() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void onResponse(String response) {
+                    response -> {
+                        try {
                             try {
-                                try {
-                                    JSONObject obj = new JSONObject(response);
-                                    if (!obj.getBoolean("error")) {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
 
-                                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                        finishAffinity();
-                                        Log.d(TAGI, "e: " + obj.getString("message"));
-                                        SharedPrefUtils.saveData(LoginActivity.this, "isLogin", true);
-                                        SharedPrefUtils.saveData(LoginActivity.this, "userData", obj.getString("message"));
-                                        showToast("Login successfully");
-                                    } else {
-                                        showToast(obj.getString("message"));
-                                        Log.d(TAGI, "e1: " + obj.getString("message"));
-                                    }
-                                    cancelProgressDialog();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    cancelProgressDialog();
+                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                    finishAffinity();
+                                    Log.d(TAGI, "e: " + obj.getString("message"));
+                                    SharedPrefUtils.saveData(LoginActivity.this, "isLogin", true);
+                                    SharedPrefUtils.saveData(LoginActivity.this, "userData", obj.getString("message"));
+                                    showToast("Login successfully");
+                                } else {
+                                    showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1: " + obj.getString("message"));
                                 }
-                            } catch (Exception e) {
+                                cancelProgressDialog();
+                            } catch (JSONException e) {
                                 e.printStackTrace();
+                                cancelProgressDialog();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            try {
-                                cancelProgressDialog();
-                                showToast(error.getMessage());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    error -> {
+                        try {
+                            cancelProgressDialog();
+                            showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }) {
                 @Override

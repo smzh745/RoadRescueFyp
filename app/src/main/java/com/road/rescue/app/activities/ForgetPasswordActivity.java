@@ -1,6 +1,5 @@
 package com.road.rescue.app.activities;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.Editable;
@@ -11,11 +10,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 
-import androidx.annotation.RequiresApi;
-
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.textview.MaterialTextView;
 import com.road.rescue.app.R;
@@ -66,12 +61,9 @@ public class ForgetPasswordActivity extends BaseActivity {
             }
         });
         //checking email input
-        email.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    validateEmailfield(((EditText) v).getText());
-                }
+        email.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                validateEmailfield(((EditText) v).getText());
             }
         });
 
@@ -99,53 +91,46 @@ public class ForgetPasswordActivity extends BaseActivity {
             setProgressDialog("Authenticating user...");
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     Constants.ROOT_URL + USER_FORGET_PASS,
-                    new Response.Listener<String>() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void onResponse(String response) {
+                    response -> {
+                        try {
                             try {
-                                try {
-                                    JSONObject obj = new JSONObject(response);
-                                    if (!obj.getBoolean("error")) {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
 
-                                        Log.d(TAGI, "e" + obj.getString("message"));
+                                    Log.d(TAGI, "e" + obj.getString("message"));
 
-                                        try {
-                                            GMailSender sender = new GMailSender("appexvalleylostphone@gmail.com", "appexvalleylostphone1234");
-                                            sender.sendMail("Road Rescue Password",
-                                                    "This is your password for  Road Rescue App  you forgot it. \n\n" +
-                                                            "Password is: " + AESUtils.decrypt(obj.getString("message")) + "\n\n" +
-                                                            "Regards \n" +
-                                                            "Road Rescue Team",
-                                                    "appexvalleylostphone@gmail.com",
-                                                    mail);
-                                        } catch (Exception e) {
-                                            Log.d(TAGI, e.getMessage(), e);
-                                        }
-                                        showToast("We have sent you your password on your registered email address.");
-                                    } else {
-                                        showToast(obj.getString("message"));
-                                        Log.d(TAGI, "e1" + obj.getString("message"));
+                                    try {
+                                        GMailSender sender = new GMailSender("appexvalleylostphone@gmail.com", "appexvalleylostphone1234");
+                                        sender.sendMail("Road Rescue Password",
+                                                "This is your password for  Road Rescue App  you forgot it. \n\n" +
+                                                        "Password is: " + AESUtils.decrypt(obj.getString("message")) + "\n\n" +
+                                                        "Regards \n" +
+                                                        "Road Rescue Team",
+                                                "appexvalleylostphone@gmail.com",
+                                                mail);
+                                    } catch (Exception e) {
+                                        Log.d(TAGI, e.getMessage(), e);
                                     }
-                                    cancelProgressDialog();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    cancelProgressDialog();
+                                    showToast("We have sent you your password on your registered email address.");
+                                } else {
+                                    showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1" + obj.getString("message"));
                                 }
-                            } catch (Exception e) {
+                                cancelProgressDialog();
+                            } catch (JSONException e) {
                                 e.printStackTrace();
+                                cancelProgressDialog();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            try {
-                                cancelProgressDialog();
-                                showToast(error.getMessage());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    error -> {
+                        try {
+                            cancelProgressDialog();
+                            showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }) {
                 @Override

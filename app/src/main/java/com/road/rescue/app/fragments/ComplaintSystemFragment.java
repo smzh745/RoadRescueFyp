@@ -1,10 +1,8 @@
 package com.road.rescue.app.fragments;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -17,12 +15,9 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
-import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -76,18 +71,8 @@ public class ComplaintSystemFragment extends Basefragment {
         setSpinner(R.array.complaint_array, complaintType);
         setSpinner(R.array.city_array, selectCity);
 
-        imagePick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog();
-            }
-        });
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              uploadComplaintDetails();
-            }
-        });
+        imagePick.setOnClickListener(v -> showDialog());
+        send.setOnClickListener(v -> uploadComplaintDetails());
         return view;
     }
 
@@ -111,25 +96,22 @@ public class ComplaintSystemFragment extends Basefragment {
                 "Pick Image from Gallery",
                 "Take Photo from Camera"};
         pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-                                break;
-                            case 1:
-                                try {
-                                    Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                    startActivityForResult(intent1, PICK_CAM);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                break;
-                        }
+                (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                            break;
+                        case 1:
+                            try {
+                                Intent intent1 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                startActivityForResult(intent1, PICK_CAM);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
                     }
                 });
         pictureDialog.show();
@@ -182,30 +164,25 @@ public class ComplaintSystemFragment extends Basefragment {
                 baseActivity.setProgressDialog("Sending your complaint..");
                 //our custom volley request
                 VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, USER_COMPLAINT,
-                        new Response.Listener<NetworkResponse>() {
-                            @Override
-                            public void onResponse(NetworkResponse response) {
-                                try {
-                                    JSONObject obj = new JSONObject(new String(response.data));
 
-                                    fetchAllComplaint(obj.getString("message"));
+                        response -> {
+                            try {
+                                JSONObject obj = new JSONObject(new String(response.data));
 
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                complaintDetails.getText().clear();
-                                Glide.with(Objects.requireNonNull(getActivity())).load(R.drawable.addimage).into(imagePick);
-                                setSpinner(R.array.complaint_array, complaintType);
-                                setSpinner(R.array.city_array, selectCity);
+                                fetchAllComplaint(obj.getString("message"));
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                            complaintDetails.getText().clear();
+                            Glide.with(Objects.requireNonNull(getActivity())).load(R.drawable.addimage).into(imagePick);
+                            setSpinner(R.array.complaint_array, complaintType);
+                            setSpinner(R.array.city_array, selectCity);
                         },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                baseActivity.showToast(error.getMessage());
-                                baseActivity.cancelProgressDialog();
+                        error -> {
+                            baseActivity.showToast(error.getMessage());
+                            baseActivity.cancelProgressDialog();
 
-                            }
                         }) {
 
                     /*
@@ -266,43 +243,36 @@ public class ComplaintSystemFragment extends Basefragment {
     private void fetchAllComplaint(final String message) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 Constants.ROOT_URL + USER_MY_COMPLAINTS,
-                new Response.Listener<String>() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    @Override
-                    public void onResponse(String response) {
+                response -> {
+                    try {
                         try {
-                            try {
-                                JSONObject obj = new JSONObject(response);
-                                if (!obj.getBoolean("error")) {
+                            JSONObject obj = new JSONObject(response);
+                            if (!obj.getBoolean("error")) {
 
-                                    Log.d(TAGI, "e1: " + obj.getString("message"));
-                                    baseActivity.showToast(message);
-                                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "myComplaints", obj.getString("message"));
-                                } else {
-                                    baseActivity.showToast(obj.getString("message"));
-                                    Log.d(TAGI, "e1: " + obj.getString("message"));
+                                Log.d(TAGI, "e1: " + obj.getString("message"));
+                                baseActivity.showToast(message);
+                                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "myComplaints", obj.getString("message"));
+                            } else {
+                                baseActivity.showToast(obj.getString("message"));
+                                Log.d(TAGI, "e1: " + obj.getString("message"));
 
 
-                                }
-                                baseActivity.cancelProgressDialog();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                baseActivity.cancelProgressDialog();
                             }
-                        } catch (Exception e) {
+                            baseActivity.cancelProgressDialog();
+                        } catch (JSONException e) {
                             e.printStackTrace();
+                            baseActivity.cancelProgressDialog();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        try {
-                            baseActivity.cancelProgressDialog();
-                            baseActivity.showToast(error.getMessage());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                error -> {
+                    try {
+                        baseActivity.cancelProgressDialog();
+                        baseActivity.showToast(error.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }) {
             @Override

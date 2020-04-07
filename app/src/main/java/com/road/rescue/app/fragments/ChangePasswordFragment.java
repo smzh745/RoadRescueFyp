@@ -1,6 +1,5 @@
 package com.road.rescue.app.fragments;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -11,11 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import androidx.annotation.RequiresApi;
-
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -71,12 +66,9 @@ public class ChangePasswordFragment extends Basefragment {
             }
         });
         //checking password input
-        passwordinput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    validatePasswordField(((EditText) v).getText());
-                }
+        passwordinput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                validatePasswordField(((EditText) v).getText());
             }
         });
         //password field validation
@@ -97,21 +89,14 @@ public class ChangePasswordFragment extends Basefragment {
             }
         });
         //checking password input
-        cpasswordinput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    validateCPasswordField(((EditText) v).getText());
-                }
-            }
-        });
+        cpasswordinput.setOnFocusChangeListener(
+                (v, hasFocus) -> {
+                    if (!hasFocus) {
+                        validateCPasswordField(((EditText) v).getText());
+                    }
+                });
 
-        resetPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetPassword();
-            }
-        });
+        resetPass.setOnClickListener(v -> resetPassword());
         return view;
     }
 
@@ -142,41 +127,34 @@ public class ChangePasswordFragment extends Basefragment {
             baseActivity.setProgressDialog("Changing Password...");
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     Constants.ROOT_URL + USER_CHANGE_PASS,
-                    new Response.Listener<String>() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void onResponse(String response) {
+                    response -> {
+                        try {
                             try {
-                                try {
-                                    JSONObject obj = new JSONObject(response);
-                                    if (!obj.getBoolean("error")) {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
 
-                                        baseActivity.showToast(obj.getString("message"));
-                                    } else {
-                                        baseActivity.showToast(obj.getString("message"));
-                                        Log.d(TAGI, "e1: " + obj.getString("message"));
-                                    }
-                                    baseActivity.cancelProgressDialog();
-                                    Objects.requireNonNull(cpass.getText()).clear();
-                                    Objects.requireNonNull(pass.getText()).clear();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    baseActivity.cancelProgressDialog();
+                                    baseActivity.showToast(obj.getString("message"));
+                                } else {
+                                    baseActivity.showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1: " + obj.getString("message"));
                                 }
-                            } catch (Exception e) {
+                                baseActivity.cancelProgressDialog();
+                                Objects.requireNonNull(cpass.getText()).clear();
+                                Objects.requireNonNull(pass.getText()).clear();
+                            } catch (JSONException e) {
                                 e.printStackTrace();
+                                baseActivity.cancelProgressDialog();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            try {
-                                baseActivity.cancelProgressDialog();
-                                baseActivity.showToast(error.getMessage());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    error -> {
+                        try {
+                            baseActivity.cancelProgressDialog();
+                            baseActivity.showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }) {
                 @Override

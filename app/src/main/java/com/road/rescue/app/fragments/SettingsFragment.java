@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textview.MaterialTextView;
@@ -31,31 +30,25 @@ public class SettingsFragment extends Basefragment {
         enableShake.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isShake"));
         enableHelp.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isHelp"));
 
-        enableShake.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", true);
-                    LoadServiceUtils.startService(getActivity());
-                    checkShakeEnabled();
-                } else {
-                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", false);
-                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", false);
-                    enableHelp.setChecked(false);
-                    LoadServiceUtils.stopService(getActivity());
-                    checkShakeEnabled();
-                }
+        enableShake.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", true);
+                LoadServiceUtils.startService(getActivity());
+                checkShakeEnabled();
+            } else {
+                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", false);
+                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", false);
+                enableHelp.setChecked(false);
+                LoadServiceUtils.stopService(getActivity());
+                checkShakeEnabled();
             }
         });
-        enableHelp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", true);
-                } else {
-                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", false);
+        enableHelp.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", true);
+            } else {
+                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", false);
 
-                }
             }
         });
 

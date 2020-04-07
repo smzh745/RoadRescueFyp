@@ -3,7 +3,6 @@ package com.road.rescue.app.fragments;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,15 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -67,12 +63,8 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
         empty_view = view.findViewById(R.id.empty_view);
         myComplaintList = new ArrayList<>();
 
-        addEmergencyContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog();
-            }
-        });
+        addEmergencyContact.setOnClickListener(
+                v -> showDialog());
     /*    if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
             init();
         } else {
@@ -187,33 +179,25 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
         MaterialButton cancelbtn = myview.findViewById(R.id.btn_cancel);
 
 
-        savebtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Get values
-                String cName1 = Objects.requireNonNull(cName.getText()).toString().trim();
-                String cContact1 = Objects.requireNonNull(cContact.getText()).toString().trim();
+        savebtn.setOnClickListener(view -> {
+            //Get values
+            String cName1 = Objects.requireNonNull(cName.getText()).toString().trim();
+            String cContact1 = Objects.requireNonNull(cContact.getText()).toString().trim();
 
-                if (TextUtils.isEmpty(cContact1) || TextUtils.isEmpty(cName1)) {
-                    baseActivity.showToast("Please fill the field");
-                    return;
-                }
-                if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
-                    addContact(cName1, cContact1);
-                } else {
-                    baseActivity.showToast("No internet connection");
-                }
-
-
-                mydialog.dismiss();
+            if (TextUtils.isEmpty(cContact1) || TextUtils.isEmpty(cName1)) {
+                baseActivity.showToast("Please fill the field");
+                return;
             }
-        });
-        cancelbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mydialog.dismiss();
+            if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
+                addContact(cName1, cContact1);
+            } else {
+                baseActivity.showToast("No internet connection");
             }
+
+
+            mydialog.dismiss();
         });
+        cancelbtn.setOnClickListener(view -> mydialog.dismiss());
         mydialog.show();
     }
 
@@ -223,53 +207,46 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
             baseActivity.setProgressDialog("Adding Emergency Contact...");
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     Constants.ROOT_URL + ADD_EMERGENCY_CONTACT,
-                    new Response.Listener<String>() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void onResponse(String response) {
+                    response -> {
+                        try {
                             try {
-                                try {
-                                    JSONObject obj = new JSONObject(response);
-                                    if (!obj.getBoolean("error")) {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
 
 
-                                        Log.d(TAGI, "e" + obj.getString("message"));
-                                        baseActivity.showToast(obj.getString("message"));
-                                        SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "eData", obj.getString("data"));
-                                        JSONArray jsonArray = new JSONArray(obj.getString("data"));
+                                    Log.d(TAGI, "e" + obj.getString("message"));
+                                    baseActivity.showToast(obj.getString("message"));
+                                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "eData", obj.getString("data"));
+                                    JSONArray jsonArray = new JSONArray(obj.getString("data"));
 
-                                        for (int i = 0; i < jsonArray.length(); i++) {
-                                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                            myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
-                                                    jsonObject.getInt("id"), jsonObject.getString("ename"),
-                                                    jsonObject.getString("econtact")));
-                                        }
-                                    } else {
-                                        baseActivity.showToast(obj.getString("message"));
-                                        Log.d(TAGI, "e1" + obj.getString("message"));
-                                        CheckEmptyState();
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
+                                                jsonObject.getInt("id"), jsonObject.getString("ename"),
+                                                jsonObject.getString("econtact")));
                                     }
-                                    setDataOnRecycler();
+                                } else {
+                                    baseActivity.showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1" + obj.getString("message"));
                                     CheckEmptyState();
-                                    baseActivity.cancelProgressDialog();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    baseActivity.cancelProgressDialog();
                                 }
-                            } catch (Exception e) {
+                                setDataOnRecycler();
+                                CheckEmptyState();
+                                baseActivity.cancelProgressDialog();
+                            } catch (JSONException e) {
                                 e.printStackTrace();
+                                baseActivity.cancelProgressDialog();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            try {
-                                baseActivity.cancelProgressDialog();
-                                baseActivity.showToast(error.getMessage());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    error -> {
+                        try {
+                            baseActivity.cancelProgressDialog();
+                            baseActivity.showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }) {
                 @Override
@@ -307,21 +284,19 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
                 "Add Contact from Phone",
                 "Add Contact Manually"};
         pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                Intent intent = new Intent(getActivity(), ShowAllContactsActivity.class);
-                                intent.putExtra("isFromContact", true);
-                                startActivity(intent);
-                                dialog.dismiss();
-                                break;
-                            case 1:
-                                addEmergencyContactDialog();
-                                dialog.dismiss();
-                                break;
-                        }
+
+                (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            Intent intent = new Intent(getActivity(), ShowAllContactsActivity.class);
+                            intent.putExtra("isFromContact", true);
+                            startActivity(intent);
+                            dialog.dismiss();
+                            break;
+                        case 1:
+                            addEmergencyContactDialog();
+                            dialog.dismiss();
+                            break;
                     }
                 });
         pictureDialog.show();
@@ -338,7 +313,7 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
         if (viewHolder instanceof EmergencyContactAdapter.MyHolder) {
             // get the removed item name to display it in snack bar
             final String name = myComplaintList.get(viewHolder.getAdapterPosition()).geteName();
-            final  int id=  myComplaintList.get(viewHolder.getAdapterPosition()).getId();
+            final int id = myComplaintList.get(viewHolder.getAdapterPosition()).getId();
 
             // backup of removed item for undo purpose
             final EmergencyContact deletedItem = myComplaintList.get(viewHolder.getAdapterPosition());
@@ -348,29 +323,26 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
             myComplaintAdapter.removeItem(viewHolder.getAdapterPosition());
             // showing snack bar with Undo option
 
-            final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case DialogInterface.BUTTON_POSITIVE:
-                            //Yes button clicked
-                            if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
-                                deleteContact(name,id);
-                            } else {
-                                baseActivity.showToast("No Internet Connection!");
-                                myComplaintAdapter.restoreItem(deletedItem, deletedIndex);
-
-                            }
-                            dialog.dismiss();
-                            break;
-
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            //No button clicked
-                            // undo is selected, restore the deleted item
+            final DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //Yes button clicked
+                        if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
+                            deleteContact(name, id);
+                        } else {
+                            baseActivity.showToast("No Internet Connection!");
                             myComplaintAdapter.restoreItem(deletedItem, deletedIndex);
-                            dialog.dismiss();
-                            break;
-                    }
+
+                        }
+                        dialog.dismiss();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        // undo is selected, restore the deleted item
+                        myComplaintAdapter.restoreItem(deletedItem, deletedIndex);
+                        dialog.dismiss();
+                        break;
                 }
             };
 
@@ -386,55 +358,48 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 Constants.ROOT_URL + DELETE_EMERGENCY_CONTACT,
-                new Response.Listener<String>() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    @Override
-                    public void onResponse(String response) {
+                response -> {
+                    try {
                         try {
-                            try {
-                                JSONObject obj = new JSONObject(response);
-                                if (!obj.getBoolean("error")) {
+                            JSONObject obj = new JSONObject(response);
+                            if (!obj.getBoolean("error")) {
 
 
-                                    Log.d(TAGI, "e" + obj.getString("message"));
-                                    baseActivity.showToast(name + " removed from list!");
-                                    myComplaintList.clear();
-                                    Log.d(TAGI, "onResponse: "+obj.getString("data"));
-                                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "eData", obj.getString("data"));
-                                    JSONArray jsonArray = new JSONArray(obj.getString("data"));
+                                Log.d(TAGI, "e" + obj.getString("message"));
+                                baseActivity.showToast(name + " removed from list!");
+                                myComplaintList.clear();
+                                Log.d(TAGI, "onResponse: " + obj.getString("data"));
+                                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "eData", obj.getString("data"));
+                                JSONArray jsonArray = new JSONArray(obj.getString("data"));
 
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                        myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
-                                                jsonObject.getInt("id"), jsonObject.getString("ename"),
-                                                jsonObject.getString("econtact")));
-                                    }
-                                } else {
-                                    baseActivity.showToast(obj.getString("message"));
-                                    Log.d(TAGI, "e1" + obj.getString("message"));
-                                    CheckEmptyState();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
+                                            jsonObject.getInt("id"), jsonObject.getString("ename"),
+                                            jsonObject.getString("econtact")));
                                 }
-                                setDataOnRecycler();
+                            } else {
+                                baseActivity.showToast(obj.getString("message"));
+                                Log.d(TAGI, "e1" + obj.getString("message"));
                                 CheckEmptyState();
-                                baseActivity.cancelProgressDialog();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                baseActivity.cancelProgressDialog();
                             }
-                        } catch (Exception e) {
+                            setDataOnRecycler();
+                            CheckEmptyState();
+                            baseActivity.cancelProgressDialog();
+                        } catch (JSONException e) {
                             e.printStackTrace();
+                            baseActivity.cancelProgressDialog();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        try {
-                            baseActivity.cancelProgressDialog();
-                            baseActivity.showToast(error.getMessage());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                error -> {
+                    try {
+                        baseActivity.cancelProgressDialog();
+                        baseActivity.showToast(error.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }) {
             @Override

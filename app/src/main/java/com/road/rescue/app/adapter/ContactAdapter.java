@@ -2,7 +2,6 @@ package com.road.rescue.app.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +10,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.road.rescue.app.R;
 import com.road.rescue.app.activities.BaseActivity;
@@ -64,13 +60,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyHolder
         final EmergencyContact emergencyContact = myComplaintList.get(position);
         holder.name.setText(emergencyContact.geteName());
         holder.num.setText(emergencyContact.geteContact());
-        holder.clickBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addContact(emergencyContact.geteName(), emergencyContact.geteContact());
-
-            }
-        });
+        holder.clickBtn.setOnClickListener(v -> addContact(emergencyContact.geteName(), emergencyContact.geteContact()));
     }
 
     @Override
@@ -91,24 +81,21 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyHolder
     }
 
     private void addContact(final String geteName, final String geteContact) {
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        //Yes button clicked
-                        if (InternetConnection.checkConnection(context)) {
-                            addContactE(geteName, geteContact);
-                        } else {
-                            ((BaseActivity) context).showToast("No internet connection");
-                        }
-                        break;
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    if (InternetConnection.checkConnection(context)) {
+                        addContactE(geteName, geteContact);
+                    } else {
+                        ((BaseActivity) context).showToast("No internet connection");
+                    }
+                    break;
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        dialog.dismiss();
-                        break;
-                }
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    dialog.dismiss();
+                    break;
             }
         };
 
@@ -122,50 +109,43 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyHolder
             ((BaseActivity) context).setProgressDialog("Adding Emergency Contact...");
             StringRequest stringRequest = new StringRequest(Request.Method.POST,
                     Constants.ROOT_URL + ADD_EMERGENCY_CONTACT,
-                    new Response.Listener<String>() {
-                        @RequiresApi(api = Build.VERSION_CODES.M)
-                        @Override
-                        public void onResponse(String response) {
+                    response -> {
+                        try {
                             try {
-                                try {
-                                    JSONObject obj = new JSONObject(response);
-                                    if (!obj.getBoolean("error")) {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
 
 
-                                        Log.d(TAGI, "e" + obj.getString("message"));
-                                        ((BaseActivity) context).showToast(obj.getString("message"));
-                                        SharedPrefUtils.saveData(context, "eData", obj.getString("data"));
-                                        if (isFromContact) {
-                                            ((AppCompatActivity) context).finish();
-                                        } else {
-                                            SharedPrefUtils.saveData(context, "isContact", true);
-                                            ((BaseActivity) context).startNewActivity(new MainActivity());
-                                            ((AppCompatActivity) context).finish();
-                                        }
+                                    Log.d(TAGI, "e" + obj.getString("message"));
+                                    ((BaseActivity) context).showToast(obj.getString("message"));
+                                    SharedPrefUtils.saveData(context, "eData", obj.getString("data"));
+                                    if (isFromContact) {
+                                        ((AppCompatActivity) context).finish();
                                     } else {
-                                        ((BaseActivity) context).showToast(obj.getString("message"));
-                                        Log.d(TAGI, "e1" + obj.getString("message"));
-
+                                        SharedPrefUtils.saveData(context, "isContact", true);
+                                        ((BaseActivity) context).startNewActivity(new MainActivity());
+                                        ((AppCompatActivity) context).finish();
                                     }
-                                    ((BaseActivity) context).cancelProgressDialog();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    ((BaseActivity) context).cancelProgressDialog();
+                                } else {
+                                    ((BaseActivity) context).showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1" + obj.getString("message"));
+
                                 }
-                            } catch (Exception e) {
+                                ((BaseActivity) context).cancelProgressDialog();
+                            } catch (JSONException e) {
                                 e.printStackTrace();
+                                ((BaseActivity) context).cancelProgressDialog();
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            try {
-                                ((BaseActivity) context).cancelProgressDialog();
-                                ((BaseActivity) context).showToast(error.getMessage());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    error -> {
+                        try {
+                            ((BaseActivity) context).cancelProgressDialog();
+                            ((BaseActivity) context).showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }) {
                 @Override

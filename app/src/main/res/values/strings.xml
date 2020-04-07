@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Road Rescue Fyp</string>
+    <string name="app_name">Road Rescue</string>
     <string name="login_to_your_account">Login to your account</string>
     <string name="sign_to_your_account">Sign Up to your account</string>
     <string name="email_add">Email Address</string>

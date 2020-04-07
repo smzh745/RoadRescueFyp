@@ -1,5 +1,6 @@
 package com.road.rescue.app.activities;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -15,6 +16,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textview.MaterialTextView;
+import com.road.rescue.app.BuildConfig;
 import com.road.rescue.app.R;
 import com.road.rescue.app.services.GPSTracker;
 import com.road.rescue.app.utils.SharedPrefUtils;
@@ -29,6 +31,7 @@ public class MainActivity extends BaseActivity {
     private GPSTracker gpsTracker;
     private String lat, longi = null;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +50,10 @@ public class MainActivity extends BaseActivity {
             View view = navigationView.getHeaderView(0);
             MaterialTextView name = view.findViewById(R.id.name);
             MaterialTextView email = view.findViewById(R.id.email);
+            MaterialTextView version = findViewById(R.id.version);
             name.setText(userName);
             email.setText(userEmail);
+            version.setText(" Version " + BuildConfig.VERSION_NAME);
             // Passing each menu ID as a set of Ids because each
             // menu should be considered as top level destinations.
             mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -60,14 +65,11 @@ public class MainActivity extends BaseActivity {
             NavigationUI.setupWithNavController(navigationView, navController);
 
             MenuItem menuItem = navigationView.getMenu().findItem(R.id.nav_logout);
-            menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    SharedPrefUtils.saveData(MainActivity.this, "isLogin", false);
-                    finish();
-                    startNewActivity(new LoginActivity());
-                    return true;
-                }
+            menuItem.setOnMenuItemClickListener(item -> {
+                SharedPrefUtils.saveData(MainActivity.this, "isLogin", false);
+                finish();
+                startNewActivity(new LoginActivity());
+                return true;
             });
 
 
