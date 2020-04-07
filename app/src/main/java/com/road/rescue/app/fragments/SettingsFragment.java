@@ -43,6 +43,10 @@ public class SettingsFragment extends Basefragment {
                     checkShakeEnabled();
                 } else {
                     SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", false);
+                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", false);
+                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isCall", false);
+                    enableHelp.setChecked(false);
+                    enableCall.setChecked(false);
                     LoadServiceUtils.stopService(getActivity());
                     checkShakeEnabled();
                 }

@@ -64,7 +64,7 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
             if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
                 if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
                     if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isCall")) {
-                        sendSmsToContacts();
+//                        sendSmsToContacts();
                     } else {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
