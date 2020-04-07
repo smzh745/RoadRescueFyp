@@ -1,81 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clickBtn"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/_10sdp"
-    android:clickable="true"
-    android:focusable="true"
-    android:padding="@dimen/_5sdp"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="@dimen/_10sdp"
-    app:cardElevation="@dimen/_5sdp">
+    android:orientation="vertical">
 
     <RelativeLayout
-        android:orientation="vertical"
+        android:id="@+id/view_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_5sdp">
-        <LinearLayout
-            android:id="@+id/thumbnail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-
-            android:layout_marginEnd="5dip"
-            android:padding="3dip">
-
-            <ImageView
-                android:id="@+id/list_image"
-                android:layout_width="@dimen/_30sdp"
-                android:layout_height="@dimen/_30sdp"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_contacts_black_24dp" />
-
-        </LinearLayout>
-
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/complaintType"
-                android:layout_width="318dp"
-                android:layout_height="40dp"
-                android:layout_toEndOf="@+id/thumbnail"
-
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="@dimen/_2sdp"
-                android:text="@string/name1"
-                android:textColor="@color/colorText"
-                android:textSize="@dimen/_12ssp" />
-
-
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/city"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/complaintType"
-                android:layout_marginTop="@dimen/_2sdp"
-                android:layout_margin="@dimen/_2sdp"
-                android:layout_toEndOf="@+id/thumbnail"
-                android:text="@string/complaint_type"
-                android:textColor="@color/colorText"
-                android:textSize="@dimen/_12ssp"
-                tools:ignore="RelativeOverlap" />
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:padding="@dimen/_10sdp">
 
         <ImageView
-            android:id="@+id/call"
-            android:layout_width="30dp"
-            android:layout_height="40dp"
+            android:id="@+id/delete_icon"
+            android:layout_width="@dimen/ic_delete"
+            android:layout_height="@dimen/ic_delete"
             android:layout_alignParentEnd="true"
-            android:layout_margin="@dimen/_5sdp"
-            android:clickable="true"
-            android:contentDescription="@string/add_emergency_contact"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:src="@drawable/ic_call_black_24dp"
-            tools:ignore="UnusedAttribute"
-            tools:targetApi="m" />
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/padd_10"
+            android:src="@drawable/ic_delete_black_24dp"
+            android:contentDescription="@string/app_name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/padd_10"
+            android:layout_toStartOf="@id/delete_icon"
+            android:text="@string/delete"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/_14ssp" />
+
     </RelativeLayout>
-</com.google.android.material.card.MaterialCardView>
+
+    <RelativeLayout
+        android:id="@+id/view_foreground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+        <com.google.android.material.card.MaterialCardView xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/clickBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="@dimen/_5sdp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardElevation="@dimen/_5sdp">
+
+            <RelativeLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp">
+                <LinearLayout
+                    android:id="@+id/thumbnail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+
+                    android:layout_marginEnd="5dip"
+                    android:padding="3dip">
+
+                    <ImageView
+                        android:id="@+id/list_image"
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:contentDescription="@string/app_name"
+                        android:src="@drawable/ic_contacts_black_24dp" />
+
+                </LinearLayout>
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/complaintType"
+                    android:layout_width="318dp"
+                    android:layout_height="40dp"
+                    android:layout_toEndOf="@+id/thumbnail"
+
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="@dimen/_2sdp"
+                    android:text="@string/name1"
+                    android:textColor="@color/colorText"
+                    android:textSize="@dimen/_12ssp" />
+
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/complaintType"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:layout_margin="@dimen/_2sdp"
+                    android:layout_toEndOf="@+id/thumbnail"
+                    android:text="@string/complaint_type"
+                    android:textColor="@color/colorText"
+                    android:textSize="@dimen/_12ssp"
+                    tools:ignore="RelativeOverlap" />
+
+                <ImageView
+                    android:id="@+id/call"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="@dimen/_5sdp"
+                    android:clickable="true"
+                    android:contentDescription="@string/add_emergency_contact"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:src="@drawable/ic_call_black_24dp"
+                    tools:ignore="UnusedAttribute"
+                    tools:targetApi="m" />
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </RelativeLayout>
+</FrameLayout>

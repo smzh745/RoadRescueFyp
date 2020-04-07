@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +14,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +32,7 @@ import com.road.rescue.app.adapter.EmergencyContactAdapter;
 import com.road.rescue.app.model.EmergencyContact;
 import com.road.rescue.app.utils.Constants;
 import com.road.rescue.app.utils.InternetConnection;
+import com.road.rescue.app.utils.RecyclerItemTouchHelper;
 import com.road.rescue.app.utils.RequestHandler;
 import com.road.rescue.app.utils.SharedPrefUtils;
 
@@ -46,13 +47,15 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.road.rescue.app.utils.Constants.ADD_EMERGENCY_CONTACT;
+import static com.road.rescue.app.utils.Constants.DELETE_EMERGENCY_CONTACT;
 import static com.road.rescue.app.utils.Constants.TAGI;
 
 
-public class EmergencyContactFragment extends Basefragment {
+public class EmergencyContactFragment extends Basefragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
     private RecyclerView recyclerView;
     private LinearLayout empty_view;
     private List<EmergencyContact> myComplaintList;
+    private EmergencyContactAdapter myComplaintAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,6 +79,12 @@ public class EmergencyContactFragment extends Basefragment {
             baseActivity.showToast("No Internet Connection!");
             init();
         }*/
+        // adding item touch helper
+        // only ItemTouchHelper.LEFT added to detect Right to Left swipe
+        // if you want both Right -> Left and Left -> Right
+        // add pass ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT as param
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
         return view;
     }
@@ -86,8 +95,8 @@ public class EmergencyContactFragment extends Basefragment {
             JSONArray jsonArray = new JSONArray(SharedPrefUtils.getStringData(Objects.requireNonNull(getActivity()), "eData"));
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                myComplaintList.add(new EmergencyContact(jsonObject.getInt("id"),
-                        jsonObject.getInt("uid"), jsonObject.getString("ename"),
+                myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
+                        jsonObject.getInt("id"), jsonObject.getString("ename"),
                         jsonObject.getString("econtact")));
             }
             setDataOnRecycler();
@@ -231,8 +240,8 @@ public class EmergencyContactFragment extends Basefragment {
 
                                         for (int i = 0; i < jsonArray.length(); i++) {
                                             JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                            myComplaintList.add(new EmergencyContact(jsonObject.getInt("id"),
-                                                    jsonObject.getInt("uid"), jsonObject.getString("ename"),
+                                            myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
+                                                    jsonObject.getInt("id"), jsonObject.getString("ename"),
                                                     jsonObject.getString("econtact")));
                                         }
                                     } else {
@@ -283,7 +292,7 @@ public class EmergencyContactFragment extends Basefragment {
     }
 
     private void setDataOnRecycler() {
-        EmergencyContactAdapter myComplaintAdapter = new EmergencyContactAdapter(getActivity(), myComplaintList);
+        myComplaintAdapter = new EmergencyContactAdapter(getActivity(), myComplaintList);
         RecyclerView.LayoutManager reLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(reLayoutManager);
         recyclerView.setAdapter(myComplaintAdapter);
@@ -323,4 +332,125 @@ public class EmergencyContactFragment extends Basefragment {
         super.onResume();
         init();
     }
+
+    @Override
+    public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction, final int position) {
+        if (viewHolder instanceof EmergencyContactAdapter.MyHolder) {
+            // get the removed item name to display it in snack bar
+            final String name = myComplaintList.get(viewHolder.getAdapterPosition()).geteName();
+            final  int id=  myComplaintList.get(viewHolder.getAdapterPosition()).getId();
+
+            // backup of removed item for undo purpose
+            final EmergencyContact deletedItem = myComplaintList.get(viewHolder.getAdapterPosition());
+            final int deletedIndex = viewHolder.getAdapterPosition();
+
+            // remove the item from recycler view
+            myComplaintAdapter.removeItem(viewHolder.getAdapterPosition());
+            // showing snack bar with Undo option
+
+            final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //Yes button clicked
+                            if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
+                                deleteContact(name,id);
+                            } else {
+                                baseActivity.showToast("No Internet Connection!");
+                                myComplaintAdapter.restoreItem(deletedItem, deletedIndex);
+
+                            }
+                            dialog.dismiss();
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            // undo is selected, restore the deleted item
+                            myComplaintAdapter.restoreItem(deletedItem, deletedIndex);
+                            dialog.dismiss();
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+            builder.setMessage("Are you sure you want to delete this number?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+
+        }
+    }
+
+    private void deleteContact(final String name, final int id) {
+        baseActivity.setProgressDialog("Deleting Emergency Contact...");
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                Constants.ROOT_URL + DELETE_EMERGENCY_CONTACT,
+                new Response.Listener<String>() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            try {
+                                JSONObject obj = new JSONObject(response);
+                                if (!obj.getBoolean("error")) {
+
+
+                                    Log.d(TAGI, "e" + obj.getString("message"));
+                                    baseActivity.showToast(name + " removed from list!");
+                                    myComplaintList.clear();
+                                    Log.d(TAGI, "onResponse: "+obj.getString("data"));
+                                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "eData", obj.getString("data"));
+                                    JSONArray jsonArray = new JSONArray(obj.getString("data"));
+
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        myComplaintList.add(new EmergencyContact(jsonObject.getInt("uid"),
+                                                jsonObject.getInt("id"), jsonObject.getString("ename"),
+                                                jsonObject.getString("econtact")));
+                                    }
+                                } else {
+                                    baseActivity.showToast(obj.getString("message"));
+                                    Log.d(TAGI, "e1" + obj.getString("message"));
+                                    CheckEmptyState();
+                                }
+                                setDataOnRecycler();
+                                CheckEmptyState();
+                                baseActivity.cancelProgressDialog();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                baseActivity.cancelProgressDialog();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try {
+                            baseActivity.cancelProgressDialog();
+                            baseActivity.showToast(error.getMessage());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+
+                Map<String, String> params = new HashMap<>();
+                params.put("uid", SharedPrefUtils.getStringData(Objects.requireNonNull(getActivity()), "uid"));
+                params.put("id", String.valueOf(id));
+
+                return params;
+            }
+        };
+
+
+        RequestHandler.getInstance(getActivity()).addToRequestQueue(stringRequest);
+    }
+
+
 }

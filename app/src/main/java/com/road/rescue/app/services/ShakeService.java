@@ -33,11 +33,13 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
     int notifyID = 1;
     String CHANNEL_ID = "my_channel_01";// The id of the channel.
     CharSequence name = "My Channel";// The user-visible name of the channel.
 
     private ShakeDetector sd;
+
     @SuppressLint("InvalidWakeLockTag")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -51,8 +53,8 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
         if (!Objects.requireNonNull(powerManager).isInteractive()) { // if screen is not already on, turn it on (get wake_lock for 10 seconds)
-             PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MH24_" +
-                     "SCREENLOCK");
+            PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MH24_" +
+                    "SCREENLOCK");
             wl.acquire(10000);
             PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MH24_SCREENLOCK");
             wl_cpu.acquire(10000);

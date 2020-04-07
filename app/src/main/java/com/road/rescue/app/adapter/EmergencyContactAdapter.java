@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -72,18 +73,32 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
         return myComplaintList.size();
     }
 
-    static class MyHolder extends RecyclerView.ViewHolder {
+   public static class MyHolder extends RecyclerView.ViewHolder {
         MaterialTextView complaintType, city;
         MaterialCardView clickBtn;
         ImageView call;
-
+       public RelativeLayout viewBackground, viewForeground;
         MyHolder(@NonNull View itemView) {
             super(itemView);
             call = itemView.findViewById(R.id.call);
             complaintType = itemView.findViewById(R.id.complaintType);
             clickBtn = itemView.findViewById(R.id.clickBtn);
             city = itemView.findViewById(R.id.city);
-
+            viewBackground = itemView.findViewById(R.id.view_background);
+            viewForeground = itemView.findViewById(R.id.view_foreground);
         }
+    }
+    public void removeItem(int position) {
+        myComplaintList.remove(position);
+        // notify the item removed by position
+        // to perform recycler view delete animations
+        // NOTE: don't call notifyDataSetChanged()
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(EmergencyContact item, int position) {
+        myComplaintList.add(position, item);
+        // notify item added by position
+        notifyItemInserted(position);
     }
 }
