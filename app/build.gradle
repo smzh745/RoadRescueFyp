@@ -46,6 +46,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.2.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'com.squareup:seismic:1.0.2'
+    implementation 'com.skyfishjy.ripplebackground:library:1.0.1'
+
     implementation files('libs/additionnal.jar')
     implementation files('libs/activation.jar')
     implementation files('libs/mail.jar')

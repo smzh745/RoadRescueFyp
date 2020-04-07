@@ -41,7 +41,7 @@
         android:textColor="@color/colorText"
         android:textSize="@dimen/_12ssp" />
 
-    <View
+<!--    <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/_2sdp"
         android:background="@color/colorGrey" />
@@ -68,5 +68,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/_2sdp"
-        android:background="@color/colorGrey" />
+        android:background="@color/colorGrey" />-->
 </LinearLayout>

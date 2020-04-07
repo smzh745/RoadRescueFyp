@@ -60,16 +60,9 @@
             android:required="false" />
 
         <service android:name=".services.ShakeService" />
-        <service android:name=".services.OverlayService" />
 
-        <activity
-            android:name=".activities.HaltScreenActivity"
-            android:excludeFromRecents="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoTitle"
-            android:turnScreenOn="true"
-            tools:targetApi="o_mr1" />
-
+        <!--   android:turnScreenOn="true"
+        tools:targetApi="o_mr1"-->
     </application>
 
 </manifest>

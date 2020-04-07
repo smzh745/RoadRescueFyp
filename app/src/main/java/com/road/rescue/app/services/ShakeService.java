@@ -1,15 +1,17 @@
 package com.road.rescue.app.services;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.telephony.SmsManager;
+import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -19,9 +21,6 @@ import com.road.rescue.app.R;
 import com.road.rescue.app.activities.MainActivity;
 import com.road.rescue.app.utils.SharedPrefUtils;
 import com.squareup.seismic.ShakeDetector;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Objects;
 
@@ -34,18 +33,12 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     public IBinder onBind(Intent intent) {
         return null;
     }
+    int notifyID = 1;
+    String CHANNEL_ID = "my_channel_01";// The id of the channel.
+    CharSequence name = "My Channel";// The user-visible name of the channel.
 
     private ShakeDetector sd;
-    private GPSTracker gpsTracker;
-    private String lat, longi = null;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        gpsTracker = new GPSTracker(this);
-
-    }
-
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startServiceOreoCondition();
@@ -54,6 +47,17 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
         sd = new ShakeDetector(this);
         sd.start(sensorManager);
 
+        // Logic to turn on the screen
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+        if (!Objects.requireNonNull(powerManager).isInteractive()) { // if screen is not already on, turn it on (get wake_lock for 10 seconds)
+             PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MH24_" +
+                     "SCREENLOCK");
+            wl.acquire(10000);
+            PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MH24_SCREENLOCK");
+            wl_cpu.acquire(10000);
+        }
+        sendNotificationMsg("Call any emergency service for help!");
         return START_STICKY;
     }
 
@@ -63,24 +67,13 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
         if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isLogin")) {
             if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
                 if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
-                    if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isCall")) {
-//                        sendSmsToContacts();
-                    } else {
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra("isHelpActive", true);
-                        startActivity(intent);
-                    }
-                }
-                if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isCall")) {
-                    Intent intent = new Intent(getApplicationContext(), OverlayService.class);
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("isHelpActive", true);
+                    startActivity(intent);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        startForegroundService(intent);
-                    } else {
-                        startService(intent);
-                    }
                 }
+
 
             }
         }
@@ -118,35 +111,51 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
         super.onDestroy();
     }
 
-    private void sendSmsToContacts() {
+    private void sendNotificationMsg(String body) {
         try {
+                /*Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);*/
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel mChannel = new NotificationChannel(
+                        CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH);
+                mChannel.setSound(null, null);
+                Objects.requireNonNull(notificationManager).createNotificationChannel(mChannel);
 
-            if (gpsTracker.canGetLocation()) {
-                lat = String.valueOf(gpsTracker.getLatitude());
-                longi = String.valueOf(gpsTracker.getLongitude());
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(body)
+                        /* .setDefaults(Notification.DEFAULT_SOUND)*/
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setLights(Color.WHITE, 2000, 3000)
+                        .setAutoCancel(true);
+//                            .setContentIntent(pendingIntent);
+
+                notificationManager.notify(notifyID, mBuilder.build());
+
+            } else {
+//Get an instance of NotificationManager//
+
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(body)
+                        .setLights(Color.WHITE, 2000, 3000)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        /*  .setDefaults(Notification.DEFAULT_SOUND)*/
+                        .setAutoCancel(true);
+//                            .setContentIntent(pendingIntent);
+
+
+                NotificationManager mNotificationManager =
+
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                Objects.requireNonNull(mNotificationManager).notify(notifyID, mBuilder.build());
             }
-            JSONArray jsonArray = new JSONArray(SharedPrefUtils.getStringData(getApplicationContext(), "eData"));
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                Log.d(TAGI, "sendSmsToContacts: " + jsonObject.getString("econtact"));
-                Log.d(TAGI, "sendSmsToContacts: long: " + longi);
-                Log.d(TAGI, "sendSmsToContacts: lat: " + lat);
-                sendSMS(jsonObject.getString("econtact"), "Please help me its an emergency. I am in trouble and in lots of pain. This is my location:\n\n" + "http://maps.google.com/?q=" + lat + "," + longi + "\n\n" +
-                        "Come hurry up!");
-
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void sendSMS(String phoneNo, String msg) {
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }
