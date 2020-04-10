@@ -112,6 +112,7 @@ public class ForgetPasswordActivity extends BaseActivity {
                                         Log.d(TAGI, e.getMessage(), e);
                                     }
                                     showToast("We have sent you your password on your registered email address.");
+                                    Objects.requireNonNull(email.getText()).clear();
                                 } else {
                                     showToast(obj.getString("message"));
                                     Log.d(TAGI, "e1" + obj.getString("message"));
