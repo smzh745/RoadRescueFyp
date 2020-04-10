@@ -33,6 +33,8 @@ public class SettingsFragment extends Basefragment {
         enableShake.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", true);
+                SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isHelp", true);
+                enableHelp.setChecked(true);
                 LoadServiceUtils.startService(getActivity());
                 checkShakeEnabled();
             } else {

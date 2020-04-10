@@ -13,4 +13,8 @@ public class Constants {
     public static final String USER_MY_COMPLAINTS = "mycomplaints/fetchcomplaints.php";
     private static final String COMPLAINT_ROOT_URL = "mycomplaints/api.php?apicall=";
     public static final String USER_COMPLAINT = ROOT_URL + COMPLAINT_ROOT_URL + "uploadpic";
+    public final static int REQUEST_CHECK_SETTINGS_GPS = 0x1;
+    public final static int REQUEST_ID_MULTIPLE_PERMISSIONS = 0x2;
+    public static final String PREFS_NAME = "MyPrefsFile";
+
 }

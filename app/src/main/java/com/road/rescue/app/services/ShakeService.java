@@ -37,6 +37,7 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     int notifyID = 1;
     String CHANNEL_ID = "my_channel_01";// The id of the channel.
     CharSequence name = "My Channel";// The user-visible name of the channel.
+    int counter = 0;
 
     private ShakeDetector sd;
 
@@ -44,42 +45,55 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startServiceOreoCondition();
+        counter = 1;
         Log.d(TAGI, "onStartCommand: ");
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sd = new ShakeDetector(this);
         sd.start(sensorManager);
 
-        // Logic to turn on the screen
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
 
-        if (!Objects.requireNonNull(powerManager).isInteractive()) { // if screen is not already on, turn it on (get wake_lock for 10 seconds)
-            PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MH24_" +
-                    "SCREENLOCK");
-            wl.acquire(10000);
-            PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MH24_SCREENLOCK");
-            wl_cpu.acquire(10000);
-        }
-        sendNotificationMsg("Call any emergency service for help!");
         return START_STICKY;
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     public void hearShake() {
         Log.d(TAGI, "hearShake: ");
-        if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isLogin")) {
-            if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
-                if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra("isHelpActive", true);
-                    startActivity(intent);
+        if (counter == 1) {
+
+            counter = counter + 1;
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            // Logic to turn on the screen
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+            if (!Objects.requireNonNull(powerManager).isInteractive()) { // if screen is not already on, turn it on (get wake_lock for 10 seconds)
+                PowerManager.WakeLock wl = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MH24_" +
+                        "SCREENLOCK");
+                wl.acquire(10000);
+                PowerManager.WakeLock wl_cpu = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MH24_SCREENLOCK");
+                wl_cpu.acquire(10000);
+            }
+            sendNotificationMsg("Shake again to send SMS for help!");
+        } else if (counter == 2) {
+            if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isLogin")) {
+                if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isShake")) {
+                    if (SharedPrefUtils.getBooleanData(getApplicationContext(), "isHelp")) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra("isHelpActive", true);
+                        startActivity(intent);
+
+                    }
+
 
                 }
-
-
             }
+            counter = 1;
+        } else {
+            counter = 1;
         }
-
     }
 
     private void startServiceOreoCondition() {
@@ -160,4 +174,6 @@ public class ShakeService extends Service implements ShakeDetector.Listener {
             e.printStackTrace();
         }
     }
+
+
 }

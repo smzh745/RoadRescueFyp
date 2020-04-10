@@ -26,10 +26,10 @@ import java.util.List;
 public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyContactAdapter.MyHolder> {
     private Context context;
     private List<EmergencyContact> myComplaintList;
-
     public EmergencyContactAdapter(Context context, List<EmergencyContact> myComplaintList) {
         this.context = context;
         this.myComplaintList = myComplaintList;
+
     }
 
     @NonNull
@@ -44,6 +44,7 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+
         final EmergencyContact myComplaint = myComplaintList.get(position);
         holder.city.setText(myComplaint.geteContact());
         holder.complaintType.setText(myComplaint.geteName());
@@ -74,7 +75,7 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
         MaterialTextView complaintType, city;
         MaterialCardView clickBtn;
         ImageView call;
-        RelativeLayout viewBackground, viewForeground;
+        public RelativeLayout viewBackground, viewForeground;
 
         MyHolder(@NonNull View itemView) {
             super(itemView);
@@ -100,4 +101,6 @@ public class EmergencyContactAdapter extends RecyclerView.Adapter<EmergencyConta
         // notify item added by position
         notifyItemInserted(position);
     }
+
+
 }

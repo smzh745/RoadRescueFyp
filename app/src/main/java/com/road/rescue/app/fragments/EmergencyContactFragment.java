@@ -3,6 +3,7 @@ package com.road.rescue.app.fragments;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -44,6 +47,7 @@ import java.util.Objects;
 
 import static com.road.rescue.app.utils.Constants.ADD_EMERGENCY_CONTACT;
 import static com.road.rescue.app.utils.Constants.DELETE_EMERGENCY_CONTACT;
+import static com.road.rescue.app.utils.Constants.PREFS_NAME;
 import static com.road.rescue.app.utils.Constants.TAGI;
 
 
@@ -52,6 +56,7 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
     private LinearLayout empty_view;
     private List<EmergencyContact> myComplaintList;
     private EmergencyContactAdapter myComplaintAdapter;
+    private ShowcaseView builder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,10 +64,11 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_emergency_contact, container, false);
         FloatingActionButton addEmergencyContact = view.findViewById(R.id.addEmergencyContact);
+
         recyclerView = view.findViewById(R.id.recycler_home);
         empty_view = view.findViewById(R.id.empty_view);
         myComplaintList = new ArrayList<>();
-
+        loadShowCase();
         addEmergencyContact.setOnClickListener(
                 v -> showDialog());
     /*    if (InternetConnection.checkConnection(Objects.requireNonNull(getActivity()))) {
@@ -417,5 +423,33 @@ public class EmergencyContactFragment extends Basefragment implements RecyclerIt
         RequestHandler.getInstance(getActivity()).addToRequestQueue(stringRequest);
     }
 
+    private void loadShowCase() {
+        SharedPreferences settings = Objects.requireNonNull(getActivity()).getSharedPreferences(PREFS_NAME, 0);
+        boolean dialogShown = settings.getBoolean("missingDialog5", false);
+        if (!dialogShown) {
 
+            builder = new ShowcaseView.Builder(Objects.requireNonNull(getActivity())).setTarget(new ViewTarget(recyclerView))
+                    .setContentTitle("Delete Item")
+                    .setContentText("" +
+                            "1. Delete any contact from list. \n" +
+                            "2. Just swipe right to delete. \n" +
+                            "3. Click Yes when done.")
+                    .blockAllTouches()
+
+                    .setStyle(R.style.CustomShowcaseTheme3)
+
+                    .setOnClickListener(v -> {
+                        if (builder.isShowing()) {
+                            builder.hide();
+                        }
+
+                    })
+                    .build();
+            builder.forceTextPosition(ShowcaseView.ABOVE_SHOWCASE);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("missingDialog5", true);
+            editor.apply();
+
+        }
+    }
 }
