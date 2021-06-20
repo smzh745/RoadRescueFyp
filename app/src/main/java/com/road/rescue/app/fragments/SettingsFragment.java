@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textview.MaterialTextView;
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 
 public class SettingsFragment extends Basefragment {
-    private SwitchMaterial enableHelp;
+    private SwitchMaterial enableHelp,enableCounter;
     private MaterialTextView enableHelpText;
 
     @Override
@@ -26,10 +27,26 @@ public class SettingsFragment extends Basefragment {
         SwitchMaterial enableShake = view.findViewById(R.id.enableShake);
         enableHelp = view.findViewById(R.id.enableHelp);
         enableHelpText = view.findViewById(R.id.enableHelpText);
+        enableCounter = view.findViewById(R.id.enableCounter);
         checkShakeEnabled();
         enableShake.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isShake"));
+        enableCounter.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isCounter"));
         enableHelp.setChecked(SharedPrefUtils.getBooleanData(Objects.requireNonNull(getActivity()), "isHelp"));
 
+        enableCounter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isCounter", true);
+                    LoadServiceUtils.startServiceCount(getActivity());
+
+                }else {
+                    SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isCounter", false);
+                    LoadServiceUtils.stopServiceCount(getActivity());
+
+                }
+            }
+        });
         enableShake.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 SharedPrefUtils.saveData(Objects.requireNonNull(getActivity()), "isShake", true);

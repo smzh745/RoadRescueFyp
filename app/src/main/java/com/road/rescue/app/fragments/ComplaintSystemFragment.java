@@ -117,39 +117,39 @@ public class ComplaintSystemFragment extends Basefragment {
         pictureDialog.show();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case PICK_IMAGE:
-                if (resultCode == RESULT_OK) {
-                    assert data != null;
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            switch (requestCode) {
+                case PICK_IMAGE:
+                    if (resultCode == RESULT_OK) {
+                        assert data != null;
 
-                    Uri path = Uri.parse(Objects.requireNonNull(data.getData()).toString());
+                        Uri path = Uri.parse(Objects.requireNonNull(data.getData()).toString());
+                        try {
+                            thumbnail = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        imagePick.setImageURI(path);
+
+                    }
+                    break;
+                case PICK_CAM:
                     try {
-                        thumbnail = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), path);
-                    } catch (IOException e) {
+                        assert data != null;
+                        thumbnail = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+                        imagePick.setImageBitmap(thumbnail);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    imagePick.setImageURI(path);
 
-                }
-                break;
-            case PICK_CAM:
-                try {
-                    assert data != null;
-                    thumbnail = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
-                    imagePick.setImageBitmap(thumbnail);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    break;
+                default:
+                    break;
 
-                break;
-            default:
-                break;
-
+            }
         }
-    }
 
     private void uploadComplaintDetails() {
         final String details = Objects.requireNonNull(complaintDetails.getText()).toString();
@@ -241,6 +241,7 @@ public class ComplaintSystemFragment extends Basefragment {
     }
 
     private void fetchAllComplaint(final String message) {
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 Constants.ROOT_URL + USER_MY_COMPLAINTS,
                 response -> {

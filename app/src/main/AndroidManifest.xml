@@ -30,6 +30,10 @@
         tools:ignore="LockedOrientationActivity"
         tools:targetApi="q">
         <activity
+            android:name=".activities.CounterActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
             android:name=".activities.ShowAllContactsActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -62,6 +66,8 @@
             android:required="false" />
 
         <service android:name=".services.ShakeService" />
+        <service android:name=".services.ShakeCounterService" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
