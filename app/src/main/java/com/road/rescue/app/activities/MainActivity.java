@@ -64,11 +64,11 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       /* if (!SharedPrefUtils.getBooleanData(this, "isLogin")) {
+        if (!SharedPrefUtils.getBooleanData(this, "isLogin")) {
             startNewActivity(new LoginActivity());
         } else if (!SharedPrefUtils.getBooleanData(this, "isContact")) {
             startNewActivity(new ShowAllContactsActivity());
-        } else {*/
+        } else {
             setUpGClient();
             gpsTracker = new GPSTracker(this);
             sendSmsToContacts();
@@ -102,7 +102,7 @@ public class MainActivity extends BaseActivity implements GoogleApiClient.Connec
             });
 
 
-//        }
+        }
     }
 
     private void sendSmsToContacts() {
